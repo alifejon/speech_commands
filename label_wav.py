@@ -56,7 +56,7 @@ def load_labels(filename):
   return [line.rstrip() for line in tf.gfile.GFile(filename)]
 
 
-def run_graph(wav_data, labels, input_layer_name, output_layer_name,
+def run_graph(wav, wav_data, labels, input_layer_name, output_layer_name,
               num_top_predictions):
   """Runs the audio data through the graph and prints predictions."""
   with tf.Session() as sess:
@@ -72,7 +72,8 @@ def run_graph(wav_data, labels, input_layer_name, output_layer_name,
     for node_id in top_k:
       human_string = labels[node_id]
       score = predictions[node_id]
-      print('%s (score = %.5f)' % (human_string, score))
+      print('%s, %s (score = %.5f)' % (wav, human_string, score))
+      break
 
     return 0
 
@@ -100,7 +101,7 @@ def label_wav_dir(wav_path, labels, graph, input_name, output_name, how_many_lab
   for wav in wav_list:
       with open(wav, 'rb') as wav_file:
           wav_data = wav_file.read()
-      run_graph(wav_data, labels_list, input_name, output_name, how_many_labels)
+      run_graph(wav, wav_data, labels_list, input_name, output_name, how_many_labels)
 
 def label_wav(wav, labels, graph, input_name, output_name, how_many_labels):
   """Loads the model and labels, and runs the inference to print predictions."""

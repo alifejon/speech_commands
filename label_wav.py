@@ -76,6 +76,31 @@ def run_graph(wav_data, labels, input_layer_name, output_layer_name,
 
     return 0
 
+def label_wav_dir(wav_path, labels, graph, input_name, output_name, how_many_labels):
+  """Loads the model and labels, and runs the inference to print predictions."""
+  # if not wav_path or not tf.gfile.Exists(wav):
+  #   tf.logging.fatal('Audio file does not exist %s', wav)
+
+  if not labels or not tf.gfile.Exists(labels):
+    tf.logging.fatal('Labels file does not exist %s', labels)
+
+  if not graph or not tf.gfile.Exists(graph):
+    tf.logging.fatal('Graph file does not exist %s', graph)
+
+  labels_list = load_labels(labels)
+
+  # load graph, which is stored in the default session
+  load_graph(graph)
+
+  from os import listdir, path, makedirs
+  from os.path import isfile, isdir, join, basename
+
+  wav_list = [join(wav_path, f) for f in listdir(wav_path) if isfile(join(wav_path, f)) and f.find('wav') > 0]
+
+  for wav in wav_list:
+      with open(wav, 'rb') as wav_file:
+          wav_data = wav_file.read()
+      run_graph(wav_data, labels_list, input_name, output_name, how_many_labels)
 
 def label_wav(wav, labels, graph, input_name, output_name, how_many_labels):
   """Loads the model and labels, and runs the inference to print predictions."""
@@ -101,7 +126,10 @@ def label_wav(wav, labels, graph, input_name, output_name, how_many_labels):
 
 def main(_):
   """Entry point for script, converts flags to arguments."""
-  label_wav(FLAGS.wav, FLAGS.labels, FLAGS.graph, FLAGS.input_name,
+  # label_wav(FLAGS.wav, FLAGS.labels, FLAGS.graph, FLAGS.input_name,
+  #           FLAGS.output_name, FLAGS.how_many_labels)
+
+  label_wav_dir(FLAGS.wav, FLAGS.labels, FLAGS.graph, FLAGS.input_name,
             FLAGS.output_name, FLAGS.how_many_labels)
 
 
